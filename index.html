@@ -3,177 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V.E.I.N. INTEL TERMINAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+    <title>V.E.I.N. | SECURE DATALINK v4.2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=VT323&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #e0e0e0;
-            --paper-texture: #dcdcdc;
-            --ink-color: #1a1a1a;
-            --red-stamp: #b32d2e;
-            --vein-blue: rgba(0, 255, 255, 0.05);
+            --glow-cyan: #00ffff;
+            --dim-cyan: rgba(0, 255, 255, 0.2);
+            --bg-dark: #050505;
+            --ink-black: #121212;
+            --paper: #dcdcdc;
+            --alert-red: #ff3333;
+            --scan-line: rgba(0, 0, 0, 0.5);
         }
 
-        body {
-            background-color: #121212; /* Terminal background */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Courier Prime', monospace;
-            overflow-x: hidden;
-        }
-
-        /* V.E.I.N. Watermark */
-        .watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 15rem;
-            color: var(--vein-blue);
-            font-weight: bold;
-            z-index: 1;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        /* The Paper Document */
-        .document {
-            background-color: var(--bg-color);
-            width: 850px;
-            padding: 80px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-            position: relative;
-            z-index: 2;
-            color: var(--ink-color);
-            border: 1px solid #999;
-            background-image: radial-gradient(var(--paper-texture) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        /* Top Secret Stamp */
-        .stamp {
-            position: absolute;
-            top: 40px;
-            right: 60px;
-            border: 4px solid var(--red-stamp);
-            color: var(--red-stamp);
-            padding: 10px 20px;
-            font-family: 'Special Elite', cursive;
-            font-size: 1.5rem;
-            transform: rotate(12deg);
-            opacity: 0.8;
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--glow-cyan);
+            font-family: 'VT323', monospace;
+            height: 100vh; overflow: hidden;
             user-select: none;
         }
 
-        header {
-            border-bottom: 2px solid var(--ink-color);
-            margin-bottom: 30px;
-            padding-bottom: 10px;
+        /* --- CRT FX & ANIMATIONS --- */
+        .crt-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+            animation: flicker 0.15s infinite;
         }
 
-        h1 {
-            font-size: 1.6rem;
-            margin: 0;
-            letter-spacing: 2px;
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
         }
 
-        .meta-data {
-            margin-bottom: 40px;
-            line-height: 1.6;
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
 
-        .meta-data span {
-            font-weight: bold;
+        .glitch-active { animation: shake 0.5s; filter: hue-rotate(90deg); }
+
+        /* --- SCREENS --- */
+        .screen { display: none; height: 100%; width: 100%; flex-direction: column; justify-content: center; align-items: center; }
+        .active { display: flex; }
+
+        /* --- BOOT SCREEN --- */
+        #boot-screen { align-items: flex-start; padding: 50px; font-size: 1.5rem; text-shadow: 0 0 5px var(--glow-cyan); }
+        .boot-line { margin: 5px 0; opacity: 0; animation: typeOn 0.1s forwards; }
+        @keyframes typeOn { to { opacity: 1; } }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen h1 { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 15px var(--glow-cyan); letter-spacing: 5px; }
+        .input-group { position: relative; margin-top: 30px; }
+        input {
+            background: rgba(0, 255, 255, 0.05); border: 2px solid var(--glow-cyan);
+            color: var(--glow-cyan); padding: 15px; font-family: 'VT323', monospace;
+            font-size: 2rem; outline: none; text-align: center; width: 300px;
+            letter-spacing: 10px; box-shadow: 0 0 20px var(--dim-cyan);
+            transition: all 0.3s;
+        }
+        input:focus { background: rgba(0, 255, 255, 0.1); box-shadow: 0 0 40px var(--glow-cyan); }
+        
+        #status-msg { height: 30px; margin-top: 20px; font-size: 1.2rem; }
+        .error { color: var(--alert-red); text-shadow: 0 0 10px var(--alert-red); }
+        .success { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+
+        /* --- INTEL SCREEN --- */
+        #intel-screen { 
+            justify-content: flex-start; padding-top: 50px; overflow-y: auto; 
+            background: #0e0e0e; cursor: default;
         }
 
-        /* Redaction Bars */
-        .redacted {
-            background-color: var(--ink-color);
-            color: var(--ink-color);
-            padding: 0 2px;
-            cursor: help;
+        /* PAPER DOCUMENT STYLING */
+        .folder-tab {
+            background: var(--paper); color: black; padding: 10px 30px; 
+            margin-right: auto; margin-left: auto; width: 740px;
+            font-family: 'Special Elite', cursive; font-weight: bold;
+            border-radius: 5px 5px 0 0; position: relative; top: 2px;
         }
 
-        section {
-            margin-bottom: 25px;
+        .document {
+            background-color: var(--paper); color: var(--ink-black);
+            width: 800px; padding: 80px; position: relative;
+            box-shadow: 0 0 100px rgba(0,0,0,1);
+            font-family: 'Courier Prime', monospace;
+            font-size: 1rem; line-height: 1.6;
+            transform: rotate(-0.5deg);
+            margin-bottom: 100px;
+            border: 1px solid #999;
         }
 
-        h2 {
-            font-size: 1.2rem;
-            text-decoration: underline;
-            margin-bottom: 10px;
+        /* Elements inside document */
+        .watermark {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 10rem; color: rgba(0,0,0,0.04);
+            font-weight: bold; pointer-events: none; z-index: 1;
+            font-family: 'Arial Black', sans-serif;
         }
 
-        p {
-            line-height: 1.5;
-            text-align: justify;
+        .stamp {
+            position: absolute; top: 40px; right: 40px;
+            border: 5px solid var(--alert-red); color: var(--alert-red);
+            padding: 10px 20px; font-family: 'Special Elite', cursive;
+            transform: rotate(12deg); font-size: 1.8rem; z-index: 5;
+            opacity: 0.8; mix-blend-mode: multiply;
         }
 
-        footer {
-            margin-top: 50px;
-            font-style: italic;
+        .redacted { 
+            background: black; color: black; padding: 0 5px; 
+            transition: 0.5s; cursor: help;
+        }
+        .redacted:hover { color: rgba(255,255,255,0.2); }
+
+        .header-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            border-bottom: 2px solid black; padding-bottom: 20px; margin-bottom: 30px;
         }
 
-        /* CRT Overlay Effect */
-        .crt::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 10;
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
+        h2 { font-size: 1.2rem; border-bottom: 1px solid #999; margin-top: 30px; font-family: 'Special Elite', cursive; }
+        
+        .download-btn {
+            position: fixed; bottom: 20px; right: 20px;
+            background: var(--glow-cyan); color: black; border: none;
+            padding: 10px 20px; font-family: 'VT323'; font-size: 1.5rem;
+            cursor: pointer; box-shadow: 0 0 20px var(--glow-cyan);
+            z-index: 2000;
+        }
+        .download-btn:hover { background: white; }
+
+        /* PRINT STYLES */
+        @media print {
+            .crt-container, .download-btn, #login-screen, #boot-screen { display: none; }
+            #intel-screen { display: block; overflow: visible; height: auto; background: white; }
+            .document { box-shadow: none; transform: none; width: 100%; padding: 0; margin: 0; border: none; }
+            body { background: white; color: black; }
         }
     </style>
 </head>
-<body class="crt">
+<body>
 
-    <div class="watermark">V.E.I.N.</div>
+    <div class="crt-container"></div>
 
-    <div class="document">
-        <div class="stamp">CLASSIFIED: LEVEL 4</div>
-        
-        <header>
-            <h1>V.E.I.N. INCIDENT REPORT: SUBJECT NIL</h1>
-        </header>
+    <div id="audio-controls"></div>
 
-        <div class="meta-data">
-            <div><span>TO:</span> V.E.I.N. High Directorate</div>
-            <div><span>FROM:</span> Lead Architect, John Flame, Sync-Core Division 1C</div>
-            <div><span>SUBJECT:</span> Post-Action Report — Project "First Runner"</div>
-            <div><span>CASE ID:</span> <span style="color: #b32d2e;">VEIN-CV-3161400187</span></div>
-            <div><span>DATE:</span> <span class="redacted">02/16</span>/2026</div>
+    <div id="boot-screen" class="screen active">
         </div>
 
-        <section>
-            <h2>I. BACKGROUND</h2>
-            <p>Subject NIL was the primary test pilot for the V.E.I.N. Mk-I Sync-Core. His kinetic output exceeded all recorded Courier metrics, allowing him to push deeper into the Inter-Zone than any previous expedition authorized by <span class="redacted">The Authority</span>.</p>
-        </section>
-
-        <section>
-            <h2>II. THE INCIDENT</h2>
-            <p>Upon reaching the predicted coordinate for "The Surface," Subject NIL experienced a catastrophic desync. Telemetry suggests he did not die, but rather "overclocked" his physical form. Instead of his heart failing, the Sync-Core evolved, merging his biology with the Void.</p>
-        </section>
-
-        <section>
-            <h2>III. BEHAVIORAL DEVIATION</h2>
-            <p>NIL has ceased all communication with V.E.I.N. command. He now resides permanently within the Inter-Zone as a "Glitch in Reality". His current objective appears to be the termination of all active Courier runs, believing that stopping their momentum is an act of mercy to prevent them from seeing the empty truth he found at <span class="redacted">[COORDINATES EXPUNGED]</span>.</p>
-        </section>
-
-        <section>
-            <h2>IV. RECOMMENDATION</h2>
-            <p>Classify NIL as a <strong>Persistent Threat</strong>. All Nav-Links (PiP) are to be programmed with "NIL Recognition Subroutines" to warn current Couriers of his approach. Under no circumstances is a Courier to engage NIL in dialogue; they must maintain <strong>Critical Velocity</strong> to survive.</p>
-        </section>
-
-        <footer>
-            Best regards,<br>
-            John Flame
-        </footer>
+    <div id="login-screen" class="screen">
+        <div style="font-size: 1.2rem; margin-bottom: 20px; opacity: 0.7;">V.E.I.N. SECURE GATEWAY // PORT 418</div>
+        <h1>IDENTITY VERIFICATION</h1>
+        <div class="input-group">
+            <input type="password" id="passcode" maxlength="6" placeholder="______" autofocus autocomplete="off">
+        </div>
+        <div id="status-msg">AWAITING INPUT...</div>
     </div>
 
+    <div id="intel-screen" class="screen">
+        <button class="download-btn" onclick="window.print()">[ PRINT_EVIDENCE ]</button>
+        
+        <div class="folder-tab">FILE: 3161400187 // ARCHIVE</div>
+        <div class="document">
+            <div class="watermark">V.E.I.N.</div>
+            <div class="stamp">TERMINATED</div>
+            
+            <center>
+                <h1 style="font-family: 'Special Elite'; font-size: 2rem; margin-bottom: 5px;">INCIDENT REPORT</h1>
+                <div style="font-size: 0.9rem;">VELOCITY & ENVIRONMENTAL INFRASTRUCTURE NETWORK</div>
+            </center>
+            <br>
+
+            <div class="header-grid">
+                <div><strong>TO:</strong> V.E.I.N. High Directorate</div>
+                <div><strong>DATE:</strong> <span class="redacted">FEB 16 2026</span></div>
+                <div><strong>FROM:</strong> Lead Architect John Flame</div>
+                <div><strong>CLEARANCE:</strong> LEVEL 5 (O5)</div>
+                <div><strong>SUBJECT:</strong> PROJECT "FIRST RUNNER"</div>
+                <div><strong>CASE ID:</strong> <span style="color: #b32d2e; font-weight:bold;">VEIN-CV-3161400187</span></div>
+            </div>
+
+            <p><strong>SUMMARY:</strong> The following document details the catastrophic failure of the <span class="redacted">Mk-I Sync-Core</span> prototype and the subsequent creation of the Class-A Persistent Threat known as "NIL".</p>
+
+            <h2>I. PRE-INCIDENT STATUS</h2>
+            <p>Subject NIL was selected for the inaugural "Deep Dive" into the Inter-Zone due to kinetic output exceeding the 99th percentile. Pre-mission psych-evals indicated high stability. Subject was equipped with the standard Kinetic Gear and the experimental Sync-Core to convert momentum into life-support energy.</p>
+
+            <h2>II. THE "GOLDILOCKS" FAILURE</h2>
+            <p>At depth <span class="redacted">250,000 Studs</span>, Subject reached the theoretical end of the Inter-Zone. Telemetry indicates he discovered that "The Surface" no longer exists. Upon this realization, Subject's heart rate dropped to zero, but velocity did not decrease.</p>
+            <p>Instead of experiencing Sync-Failure (Death), the Core <strong>inverted</strong>. It began pulling energy <em>from</em> the Void to sustain the body. This caused a localized reality collapse.</p>
+
+            <h2>III. CURRENT PHYSIOLOGY (THE GLITCH)</h2>
+            <p>NIL is no longer biological. He exists as a "kinetic echo." 
+            <ul>
+                <li><strong>Appearance:</strong> A jagged, vibrating silhouette of Vanta-black matter.</li>
+                <li><strong>Speed:</strong> Matches target velocity exactly.</li>
+                <li><strong>Capabilities:</strong> Subject generates a "De-Sync Field." If a Courier allows NIL within 10 studs, their own reality begins to fragment (Visual hallucinations, control inversion).</li>
+            </ul></p>
+
+            <h2>IV. CONTAINMENT PROTOCOLS</h2>
+            <p>Physical containment is impossible due to Subject's ability to phase through static geometry. Current strategy relies on the <strong>"Goldilocks Protocol"</strong>:</p>
+            <p><em>"All active Couriers must maintain a distance of < 500 studs from NIL. Exceeding this distance triggers a 'Catastrophe' event (Time Reset). Falling behind results in immediate termination."</em></p>
+
+            <h2>V. RELATED PHENOMENA</h2>
+            <p>The incident has awakened the Abyss. Sensors detect new entities manifesting from NIL's trail:
+            <ul>
+                <li><strong>GLUTTONY:</strong> Manifests as path spikes. Attracted to blood trails.</li>
+                <li><strong>ENTITY 001:</strong> A massive hand observed deleting path chunks. Believed to be the Abyss trying to "clean" the corrupted data.</li>
+            </ul></p>
+
+            <br>
+            <div style="border: 2px dashed black; padding: 15px; background: #eee;">
+                <strong>NOTE FROM DIRECTORATE:</strong><br>
+                <em>"We cannot kill him. We can only run. Use the Couriers to keep him distracted. As long as he is chasing them, he is not coming for us."</em>
+            </div>
+
+            <p style="margin-top: 40px; text-align: center; font-family: 'VT323'; font-size: 1.2rem;">
+                // END OF FILE //<br>
+                "Efficiency through Velocity."
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. AUDIO SYNTHESIZER (No files needed!) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'type') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            }
+            else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+            else if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            }
+            else if (type === 'boot') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            }
+        }
+
+        // --- 2. BOOT SEQUENCE ---
+        const bootScreen = document.getElementById('boot-screen');
+        const bootText = [
+            "V.E.I.N. BIOS v4.2",
+            "INITIALIZING KINETIC DRIVERS...",
+            "CHECKING SYNC-CORE INTEGRITY... [OK]",
+            "CONNECTING TO INTER-ZONE RELAY...",
+            "ESTABLISHING SECURE CONNECTION...",
+            "ACCESSING ARCHIVE SERVER...",
+            "SYSTEM READY."
+        ];
+
+        let lineIndex = 0;
+        
+        function runBoot() {
+            if (lineIndex < bootText.length) {
+                const line = document.createElement('div');
+                line.className = 'boot-line';
+                line.innerText = bootText[lineIndex];
+                bootScreen.appendChild(line);
+                playSound('boot');
+                lineIndex++;
+                setTimeout(runBoot, Math.random() * 300 + 100);
+            } else {
+                setTimeout(() => {
+                    document.getElementById('boot-screen').classList.remove('active');
+                    document.getElementById('login-screen').classList.add('active');
+                    document.getElementById('passcode').focus();
+                }, 1000);
+            }
+        }
+
+        // Click anywhere to start (Browsers block audio otherwise)
+        document.body.addEventListener('click', () => {
+            if (lineIndex === 0) runBoot();
+        }, { once: true });
+        
+        // Add "Click to Start" prompt
+        const prompt = document.createElement('div');
+        prompt.innerText = "[ CLICK ANYWHERE TO INITIALIZE SYSTEM ]";
+        prompt.style.marginTop = "20px";
+        prompt.className = "boot-line";
+        bootScreen.appendChild(prompt);
+
+
+        // --- 3. LOGIN LOGIC ---
+        const input = document.getElementById('passcode');
+        const loginScreen = document.getElementById('login-screen');
+        const intelScreen = document.getElementById('intel-screen');
+        const statusMsg = document.getElementById('status-msg');
+        const SECRET_CODE = "001001"; 
+
+        input.addEventListener('input', () => playSound('type'));
+
+        input.addEventListener('keyup', (e) => {
+            if (input.value === SECRET_CODE) {
+                playSound('success');
+                statusMsg.innerHTML = "<span class='success'>ACCESS GRANTED. DECRYPTING...</span>";
+                input.disabled = true;
+                
+                setTimeout(() => {
+                    loginScreen.classList.remove('active');
+                    intelScreen.classList.add('active');
+                }, 1500);
+
+            } else if (input.value.length === 6) {
+                playSound('error');
+                statusMsg.innerHTML = "<span class='error'>ERR_INVALID_HASH // UNAUTHORIZED</span>";
+                document.body.classList.add('glitch-active');
+                
+                setTimeout(() => {
+                    document.body.classList.remove('glitch-active');
+                    input.value = "";
+                    statusMsg.innerText = "AWAITING INPUT...";
+                }, 800);
+            }
+        });
+
+        // --- 4. RANDOM GLITCHES ---
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                document.querySelector('.crt-container').style.opacity = 0.5;
+                setTimeout(() => {
+                    document.querySelector('.crt-container').style.opacity = 0.9;
+                }, 50);
+            }
+        }, 2000);
+
+    </script>
 </body>
 </html>
