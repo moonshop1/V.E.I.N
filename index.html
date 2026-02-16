@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V.E.I.N. INTEL TERMINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #e0e0e0;
+            --paper-texture: #dcdcdc;
+            --ink-color: #1a1a1a;
+            --red-stamp: #b32d2e;
+            --vein-blue: rgba(0, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: #121212; /* Terminal background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Courier Prime', monospace;
+            overflow-x: hidden;
+        }
+
+        /* V.E.I.N. Watermark */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 15rem;
+            color: var(--vein-blue);
+            font-weight: bold;
+            z-index: 1;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* The Paper Document */
+        .document {
+            background-color: var(--bg-color);
+            width: 850px;
+            padding: 80px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 2;
+            color: var(--ink-color);
+            border: 1px solid #999;
+            background-image: radial-gradient(var(--paper-texture) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Top Secret Stamp */
+        .stamp {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            border: 4px solid var(--red-stamp);
+            color: var(--red-stamp);
+            padding: 10px 20px;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.5rem;
+            transform: rotate(12deg);
+            opacity: 0.8;
+            user-select: none;
+        }
+
+        header {
+            border-bottom: 2px solid var(--ink-color);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .meta-data {
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .meta-data span {
+            font-weight: bold;
+        }
+
+        /* Redaction Bars */
+        .redacted {
+            background-color: var(--ink-color);
+            color: var(--ink-color);
+            padding: 0 2px;
+            cursor: help;
+        }
+
+        section {
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            text-decoration: underline;
+            margin-bottom: 10px;
+        }
+
+        p {
+            line-height: 1.5;
+            text-align: justify;
+        }
+
+        footer {
+            margin-top: 50px;
+            font-style: italic;
+        }
+
+        /* CRT Overlay Effect */
+        .crt::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 10;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="crt">
+
+    <div class="watermark">V.E.I.N.</div>
+
+    <div class="document">
+        <div class="stamp">CLASSIFIED: LEVEL 4</div>
+        
+        <header>
+            <h1>V.E.I.N. INCIDENT REPORT: SUBJECT NIL</h1>
+        </header>
+
+        <div class="meta-data">
+            <div><span>TO:</span> V.E.I.N. High Directorate</div>
+            <div><span>FROM:</span> Lead Architect, John Flame, Sync-Core Division 1C</div>
+            <div><span>SUBJECT:</span> Post-Action Report — Project "First Runner"</div>
+            <div><span>CASE ID:</span> <span style="color: #b32d2e;">VEIN-CV-3161400187</span></div>
+            <div><span>DATE:</span> <span class="redacted">02/16</span>/2026</div>
+        </div>
+
+        <section>
+            <h2>I. BACKGROUND</h2>
+            <p>Subject NIL was the primary test pilot for the V.E.I.N. Mk-I Sync-Core. His kinetic output exceeded all recorded Courier metrics, allowing him to push deeper into the Inter-Zone than any previous expedition authorized by <span class="redacted">The Authority</span>.</p>
+        </section>
+
+        <section>
+            <h2>II. THE INCIDENT</h2>
+            <p>Upon reaching the predicted coordinate for "The Surface," Subject NIL experienced a catastrophic desync. Telemetry suggests he did not die, but rather "overclocked" his physical form. Instead of his heart failing, the Sync-Core evolved, merging his biology with the Void.</p>
+        </section>
+
+        <section>
+            <h2>III. BEHAVIORAL DEVIATION</h2>
+            <p>NIL has ceased all communication with V.E.I.N. command. He now resides permanently within the Inter-Zone as a "Glitch in Reality". His current objective appears to be the termination of all active Courier runs, believing that stopping their momentum is an act of mercy to prevent them from seeing the empty truth he found at <span class="redacted">[COORDINATES EXPUNGED]</span>.</p>
+        </section>
+
+        <section>
+            <h2>IV. RECOMMENDATION</h2>
+            <p>Classify NIL as a <strong>Persistent Threat</strong>. All Nav-Links (PiP) are to be programmed with "NIL Recognition Subroutines" to warn current Couriers of his approach. Under no circumstances is a Courier to engage NIL in dialogue; they must maintain <strong>Critical Velocity</strong> to survive.</p>
+        </section>
+
+        <footer>
+            Best regards,<br>
+            John Flame
+        </footer>
+    </div>
+
+</body>
+</html>
